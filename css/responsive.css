@@ -1,0 +1,379 @@
+/**
+ * Responsive CSS - Media queries for responsiveness
+ * Daily Task Completion App
+ */
+
+/* ============================================
+   Tablet Breakpoint (768px and below)
+   ============================================ */
+@media (max-width: 768px) {
+    /* Body padding */
+    body {
+        padding: var(--spacing-sm);
+    }
+
+    /* Header */
+    header h1 {
+        font-size: var(--font-size-xxl);
+    }
+
+    /* Auth container */
+    .auth-container {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    /* Google sign-in button */
+    .google-signin-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* User info */
+    .user-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .user-details {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    /* Controls */
+    .controls {
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    /* Filter rows */
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-row.date-filters-row {
+        padding-bottom: var(--spacing-sm);
+    }
+
+    /* Filter actions */
+    .filter-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    /* Date filters */
+    .date-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .single-date-group,
+    .date-group {
+        width: 100%;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .single-date-group label,
+    .date-group label {
+        min-width: 60px;
+    }
+
+    .single-date-group input[type="date"],
+    .date-group input[type="date"] {
+        flex: 1;
+        max-width: none;
+    }
+
+    /* Selector groups */
+    .list-selector-group,
+    .task-selector-group {
+        width: 100%;
+    }
+
+    /* Apply button */
+    .apply-btn {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    /* Preset buttons */
+    .preset-buttons {
+        justify-content: center;
+    }
+
+    /* Summary stats */
+    .summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Chart row */
+    .chart-row {
+        grid-template-columns: 1fr;
+    }
+
+    /* Chart wrapper */
+    .chart-wrapper {
+        height: 300px;
+    }
+
+    /* Task details header */
+    .task-details-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    /* Task list item */
+    .task-list li {
+        flex-wrap: wrap;
+    }
+
+    .task-list-meta {
+        width: 100%;
+        margin-top: var(--spacing-xs);
+    }
+}
+
+/* ============================================
+   Mobile Breakpoint (480px and below)
+   ============================================ */
+@media (max-width: 480px) {
+    /* Typography */
+    header h1 {
+        font-size: var(--font-size-xl);
+    }
+
+    header p {
+        font-size: var(--font-size-sm);
+    }
+
+    /* Summary stats */
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: var(--font-size-xl);
+    }
+
+    /* Date inputs */
+    .date-group input[type="date"],
+    .single-date-group input[type="date"] {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    /* Select inputs */
+    .list-selector-group select,
+    .task-selector-group select {
+        font-size: var(--font-size-sm);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    /* Preset buttons */
+    .preset-btn {
+        font-size: var(--font-size-xs);
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    /* Chart container */
+    .chart-container {
+        padding: var(--spacing-lg);
+    }
+
+    .chart-container h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    /* Task details */
+    .task-details-container {
+        padding: var(--spacing-lg);
+    }
+
+    .task-details-header h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    /* Task list */
+    .task-list li {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .task-list-item {
+        font-size: var(--font-size-sm);
+    }
+
+    .task-link {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* ============================================
+   Small Mobile (360px and below)
+   ============================================ */
+@media (max-width: 360px) {
+    /* Body */
+    body {
+        padding: var(--spacing-xs);
+    }
+
+    /* Header */
+    header {
+        margin-bottom: var(--spacing-lg);
+    }
+
+    header h1 {
+        font-size: var(--font-size-lg);
+    }
+
+    /* Auth container */
+    .auth-container {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-lg);
+    }
+
+    /* Controls */
+    .controls {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-lg);
+    }
+
+    /* Chart wrapper */
+    .chart-wrapper {
+        height: 250px;
+    }
+
+    .chart-wrapper-small {
+        height: 200px;
+    }
+
+    /* Summary stats */
+    .stat-card {
+        padding: var(--spacing-md);
+    }
+
+    .stat-value {
+        font-size: var(--font-size-lg);
+    }
+
+    .stat-label {
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* ============================================
+   Large Tablet / Small Desktop (1024px and below)
+   ============================================ */
+@media (max-width: 1024px) {
+    /* Date filters */
+    .date-filters {
+        flex-wrap: wrap;
+    }
+
+    .single-date-group {
+        flex: 1 1 100%;
+    }
+
+    .date-group {
+        flex: 1 1 200px;
+    }
+
+    /* Chart row */
+    .chart-row {
+        gap: var(--spacing-md);
+    }
+}
+
+/* ============================================
+   Large Desktop (1400px and above)
+   ============================================ */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .chart-wrapper {
+        height: 450px;
+    }
+
+    .chart-wrapper-small {
+        height: 350px;
+    }
+
+    .summary-stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    body {
+        background: white;
+        color: black;
+        padding: 0;
+    }
+
+    .auth-container,
+    .controls,
+    .refresh-btn,
+    .preset-buttons,
+    .apply-btn {
+        display: none !important;
+    }
+
+    .chart-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+
+    .task-details-container {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        break-inside: avoid;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+
+    a[href]::after {
+        content: " (" attr(href) ")";
+    }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ============================================
+   High Contrast Mode
+   ============================================ */
+@media (prefers-contrast: high) {
+    :root {
+        --color-border-default: #ffffff;
+        --color-border-element: #ffffff;
+        --color-text-muted: #ffffff;
+    }
+
+    .google-signin-btn {
+        border: 3px solid #000000;
+    }
+
+    .preset-btn,
+    .apply-btn,
+    .refresh-btn {
+        border: 2px solid #ffffff;
+    }
+}

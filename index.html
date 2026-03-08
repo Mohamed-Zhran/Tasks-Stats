@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Completion</title>
+
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Application Styles -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+
+    <!-- Application Scripts (deferred for performance) -->
+    <script type="module" src="js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📅 Daily Task Completion</h1>
+            <p>Track your completed tasks per day</p>
+        </header>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage"></div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            ⏳ Loading and analyzing tasks...
+        </div>
+
+        <!-- Authentication Container -->
+        <div class="auth-container active" id="authContainer">
+            <button class="google-signin-btn" id="googleSigninBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Sign in with Google
+            </button>
+
+            <div class="auth-divider">or</div>
+
+            <input type="file" id="fileInput" accept=".json">
+            <label for="fileInput" class="file-input-label">
+                📁 Load Tasks.json File
+            </label>
+            <p style="margin-top: 15px; color: #666;">
+                Sign in with Google to sync your tasks automatically, or upload your Tasks.json file manually.
+            </p>
+        </div>
+
+        <!-- Auth Success Container -->
+        <div class="auth-container hidden" id="authSuccessContainer">
+            <div class="user-info">
+                <div class="user-details">
+                    <img src="" alt="User Avatar" class="user-avatar" id="userAvatar">
+                    <div>
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-email" id="userEmail"></div>
+                    </div>
+                </div>
+                <button class="signout-btn" id="signoutBtn">Sign Out</button>
+            </div>
+            <button class="refresh-btn" id="refreshTasksBtn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                </svg>
+                Refresh Tasks
+            </button>
+        </div>
+
+        <!-- File Input Container (shown when no auth) -->
+        <div class="file-input-container hidden" id="fileInputContainer">
+            <p style="margin-top: 15px; color: #666;">
+                Please select your Tasks.json file to view task completion statistics.
+            </p>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" style="display: none;">
+            <!-- Controls -->
+            <div class="controls">
+                <!-- Row 1: List and Task Selectors -->
+                <div class="filter-row">
+                    <div class="list-selector-group">
+                        <label for="listSelector">📁 List:</label>
+                        <select id="listSelector">
+                            <option value="all">All Lists (Combined)</option>
+                        </select>
+                    </div>
+
+                    <div class="task-selector-group">
+                        <label for="taskSelector">📋 Task:</label>
+                        <select id="taskSelector">
+                            <option value="all">All Tasks (Combined)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Row 2: Date Filters -->
+                <div class="filter-row date-filters-row">
+                    <div class="single-date-group">
+                        <label for="singleDate">📅 On:</label>
+                        <input type="date" id="singleDate">
+                    </div>
+
+                    <div class="date-group">
+                        <label for="startDate">From:</label>
+                        <input type="date" id="startDate">
+                    </div>
+
+                    <div class="date-group">
+                        <label for="endDate">To:</label>
+                        <input type="date" id="endDate">
+                    </div>
+                </div>
+
+                <!-- Row 3: Preset Buttons -->
+                <div class="filter-actions">
+                    <div class="preset-buttons">
+                        <button class="preset-btn" data-days="today">Today</button>
+                        <button class="preset-btn" data-days="yesterday">Yesterday</button>
+                        <button class="preset-btn" data-days="7">Last 7 Days</button>
+                        <button class="preset-btn" data-days="14">Last 14 Days</button>
+                        <button class="preset-btn" data-days="30">Last 30 Days</button>
+                        <button class="preset-btn active" data-days="all">All Time</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalCompleted">0</div>
+                    <div class="stat-label">Total Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgPerDay">0</div>
+                    <div class="stat-label">Avg Per Day</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bestDay">-</div>
+                    <div class="stat-label">Best Day</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bestDayCount">0</div>
+                    <div class="stat-label">Tasks on Best Day</div>
+                </div>
+            </div>
+
+            <!-- Main Chart -->
+            <div class="chart-container">
+                <h3>📊 Completed Tasks Per Day</h3>
+                <div class="chart-wrapper">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Task Details -->
+            <div class="task-details-container" id="taskDetailsContainer">
+                <div class="task-details-header">
+                    <h3 id="taskDetailsTitle">📋 Completed Tasks</h3>
+                    <button class="close-btn" id="closeTaskDetails">×</button>
+                </div>
+                <ul class="task-list" id="taskDetailsList"></ul>
+            </div>
+
+            <!-- Secondary Charts -->
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3>✅ Completed vs ❌ Uncompleted</h3>
+                    <div class="chart-wrapper-small">
+                        <canvas id="completionStatusChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>📋 Completion Rate by Task</h3>
+                    <div class="chart-wrapper-small">
+                        <canvas id="taskCompletionRateChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
