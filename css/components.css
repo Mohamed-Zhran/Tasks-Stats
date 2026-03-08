@@ -257,13 +257,13 @@
 .date-group,
 .single-date-group {
     flex: 1;
-    min-width: 200px;
+    min-width: 180px;
 }
 
 .list-selector-group,
 .task-selector-group {
     flex: 1;
-    min-width: 250px;
+    min-width: 200px;
 }
 
 /* ============================================

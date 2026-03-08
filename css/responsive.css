@@ -64,28 +64,44 @@
     .date-filters {
         flex-direction: column;
         align-items: stretch;
+        gap: var(--spacing-md);
     }
 
     .single-date-group,
     .date-group {
         width: 100%;
-        margin-bottom: var(--spacing-sm);
+        min-width: auto;
+        margin-bottom: 0;
     }
 
     .single-date-group label,
     .date-group label {
-        min-width: 60px;
+        min-width: 50px;
     }
 
     .single-date-group input[type="date"],
     .date-group input[type="date"] {
         flex: 1;
         max-width: none;
+        width: 100%;
     }
 
     /* Selector groups */
     .list-selector-group,
     .task-selector-group {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .list-selector-group label,
+    .task-selector-group label {
+        min-width: 50px;
+    }
+
+    .list-selector-group select,
+    .task-selector-group select {
+        flex: 1;
+        max-width: none;
         width: 100%;
     }
 
@@ -162,11 +178,33 @@
         padding: var(--spacing-xs) var(--spacing-sm);
     }
 
+    .date-filters {
+        gap: var(--spacing-sm);
+    }
+
+    .date-group,
+    .single-date-group,
+    .list-selector-group,
+    .task-selector-group {
+        width: 100%;
+        min-width: auto;
+        gap: var(--spacing-xs);
+    }
+
+    .date-group label,
+    .single-date-group label,
+    .list-selector-group label,
+    .task-selector-group label {
+        min-width: 45px;
+        font-size: var(--font-size-sm);
+    }
+
     /* Select inputs */
     .list-selector-group select,
     .task-selector-group select {
         font-size: var(--font-size-sm);
         padding: var(--spacing-xs) var(--spacing-sm);
+        width: 100%;
     }
 
     /* Preset buttons */
@@ -237,6 +275,35 @@
         border-radius: var(--radius-lg);
     }
 
+    /* Date filters - very small screens */
+    .date-filters {
+        gap: 5px;
+    }
+
+    /* Form groups - very small screens */
+    .date-group,
+    .single-date-group,
+    .list-selector-group,
+    .task-selector-group {
+        gap: 5px;
+    }
+
+    .date-group label,
+    .single-date-group label,
+    .list-selector-group label,
+    .task-selector-group label {
+        min-width: 40px;
+        font-size: var(--font-size-xs);
+    }
+
+    .date-group input[type="date"],
+    .single-date-group input[type="date"],
+    .list-selector-group select,
+    .task-selector-group select {
+        font-size: var(--font-size-xs);
+        padding: 8px var(--spacing-sm);
+    }
+
     /* Chart wrapper */
     .chart-wrapper {
         height: 250px;
@@ -274,7 +341,7 @@
     }
 
     .date-group {
-        flex: 1 1 200px;
+        flex: 1 1 auto;
     }
 
     /* Chart row */
