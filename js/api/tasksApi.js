@@ -5,6 +5,7 @@
 
 import { config } from '../config.js';
 import { retry } from '../utils/helpers.js';
+import { handleApiError } from '../utils/apiErrorHandler.js';
 
 class TasksAPI {
     constructor() {
@@ -106,7 +107,7 @@ class TasksAPI {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Tasks API error: ${response.status}`);
+                    throw handleApiError(response);
                 }
 
                 return response.json();

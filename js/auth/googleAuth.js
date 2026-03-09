@@ -146,6 +146,12 @@ class GoogleAuth {
                 }
             });
 
+            if (response.status === 401) {
+                this.signOut();
+                this._handleError('Session expired. Please sign in again.');
+                return;
+            }
+
             if (response.ok) {
                 const user = await response.json();
                 this._handleSuccessfulAuth(token, user);

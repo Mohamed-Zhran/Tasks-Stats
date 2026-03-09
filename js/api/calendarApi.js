@@ -6,6 +6,7 @@
 import { config, CALENDAR_COLORS } from '../config.js';
 import { parseISODate, addDays } from '../utils/dateUtils.js';
 import { retry } from '../utils/helpers.js';
+import { handleApiError } from '../utils/apiErrorHandler.js';
 
 class CalendarAPI {
     constructor() {
@@ -172,7 +173,7 @@ class CalendarAPI {
                 });
 
                 if (!response.ok) {
-                    throw new Error(`Calendar API error: ${response.status}`);
+                    throw handleApiError(response);
                 }
 
                 return response.json();
