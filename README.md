@@ -6,7 +6,7 @@ A clean, modular web application for tracking daily task completion from Google 
 
 - 🔄 **Google OAuth2 Integration** - Secure authentication with Google
 - 📋 **Google Tasks API** - Sync tasks from all your task lists
-- 📅 **Google Calendar Integration** - Track tasks marked with Sage (completed) and Graphite (uncompleted) colors
+- 📅 **Google Calendar Integration** - Track tasks by event color: Sage = completed, all other colors = uncompleted
 - 📊 **Interactive Charts** - Visualize completion trends with Chart.js
 - 📁 **File Upload** - Import Tasks.json files manually
 - 🎨 **Modern UI** - Dark theme with responsive design
@@ -115,12 +115,16 @@ Navigate to `http://localhost:5500` (or your configured port)
 
 The app uses Google Calendar event colors to determine task status:
 - **🟢 Sage (Green)** = Completed tasks
-- **⚫ Graphite (Gray)** = Uncompleted tasks
+- **🎨 Any Other Color** = Uncompleted tasks (use different colors for task difficulty/priority)
 
 To mark tasks in Calendar:
 1. Create calendar events for your tasks
 2. Set the event color to **Sage** when completed
-3. Set the event color to **Graphite** when pending
+3. Use different colors for uncompleted tasks to indicate difficulty or priority:
+   - 🔴 Red = Hard/High priority
+   - 🟡 Yellow = Medium priority
+   - 🔵 Blue = Easy/Low priority
+   - Or any color scheme you prefer
 
 ### Filters
 

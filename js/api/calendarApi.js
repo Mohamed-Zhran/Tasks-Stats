@@ -112,9 +112,9 @@ class CalendarAPI {
                 continue;
             }
 
-            // Filter by color: Sage (2) = completed, Graphite (8) = uncompleted
+            // Filter by color: Sage (2) = completed, all other colors = uncompleted
             const colorId = event.colorId;
-            if (colorId !== CALENDAR_COLORS.SAGE && colorId !== CALENDAR_COLORS.GRAPHITE) {
+            if (!colorId) {
                 continue;
             }
 
@@ -146,7 +146,7 @@ class CalendarAPI {
 
             if (colorId === CALENDAR_COLORS.SAGE) {
                 completed.push(taskData);
-            } else if (colorId === CALENDAR_COLORS.GRAPHITE) {
+            } else {
                 taskData.status = config.taskStatus.needsAction;
                 taskData.due = taskDate;
                 uncompleted.push(taskData);

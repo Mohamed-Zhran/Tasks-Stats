@@ -15,8 +15,7 @@ export const config = {
 
     calendar: {
         colorIds: {
-            completed: '2',
-            uncompleted: '8'
+            completed: '2'
         },
         eventColors: {
             '1': '#a79b8e',
@@ -80,6 +79,5 @@ export const TASK_STATUS = {
 };
 
 export const CALENDAR_COLORS = {
-    SAGE: '2',
-    GRAPHITE: '8'
+    SAGE: '2'
 };
