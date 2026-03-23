@@ -207,9 +207,9 @@ class TaskApp {
     _handleListChange(e) {
         const selectedList = e.target.value;
 
-        // Reset preset buttons
-        updateActivePreset('all');
-        stateManager.setActivePreset('all');
+        // Reset preset buttons to today
+        updateActivePreset('today');
+        stateManager.setActivePreset('today');
 
         // Populate task selector for selected list
         const state = stateManager.getFullState();
@@ -225,9 +225,9 @@ class TaskApp {
 
         populateSelect('taskSelector', taskOptions, 'All Tasks (Combined)');
 
-        // Sync filters and set all-time range
+        // Sync filters and set today's range
         this._syncFiltersFromDOM();
-        stateManager.setAllTimeRange();
+        stateManager.setTodayRange();
         this._updateCharts();
     }
 

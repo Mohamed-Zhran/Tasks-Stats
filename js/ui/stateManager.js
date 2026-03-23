@@ -168,7 +168,7 @@ class StateManager {
     getAccessToken() {
         const tokenInfo = localStorage.getItem('google_access_token');
         if (!tokenInfo) return null;
-        
+
         try {
             const token = JSON.parse(tokenInfo);
             return token.access_token || token;
@@ -220,9 +220,10 @@ class StateManager {
      * Reset filters to default
      */
     resetFilters() {
+        const today = new Date();
         this.state.filters = {
-            startDate: this.state.dateRange.min,
-            endDate: this.state.dateRange.max,
+            startDate: today,
+            endDate: today,
             listName: 'all',
             taskName: 'all'
         };
