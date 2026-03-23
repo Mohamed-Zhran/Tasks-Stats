@@ -162,6 +162,22 @@ class StateManager {
     }
 
     /**
+     * Get access token
+     * @returns {string|null} Access token
+     */
+    getAccessToken() {
+        const tokenInfo = localStorage.getItem('google_access_token');
+        if (!tokenInfo) return null;
+        
+        try {
+            const token = JSON.parse(tokenInfo);
+            return token.access_token || token;
+        } catch {
+            return tokenInfo;
+        }
+    }
+
+    /**
      * Set task data
      * @param {Object} taskData - Task data object
      */

@@ -8,8 +8,8 @@ import { sortBy } from '../utils/helpers.js';
 
 class FilterService {
     /**
-     * Filter completed tasks by date range and criteria
-     * @param {Array} tasks - Array of completed tasks
+     * Filter tasks by date range and criteria (works for both completed and uncompleted)
+     * @param {Array} tasks - Array of tasks
      * @param {Object} filters - Filter criteria
      * @param {Date} filters.startDate - Start date
      * @param {Date} filters.endDate - End date
@@ -25,8 +25,8 @@ class FilterService {
         const endDateStr = formatDate(endDate);
 
         return tasks.filter(task => {
-            // Use completion_date string for exact date comparison
-            const taskDateStr = task.completion_date;
+            // Use completion_date for completed tasks, due date for uncompleted
+            const taskDateStr = task.completion_date || task.due?.split('T')[0];
             if (!taskDateStr || taskDateStr < startDateStr || taskDateStr > endDateStr) {
                 return false;
             }

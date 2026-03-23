@@ -215,17 +215,6 @@ export function hideAuthSuccess() {
 }
 
 /**
- * Show file input container
- */
-export function showFileInput() {
-    const fileInputContainer = getElement('fileInputContainer');
-    if (fileInputContainer) {
-        removeClass(fileInputContainer, 'hidden');
-        addClass(fileInputContainer, 'active');
-    }
-}
-
-/**
  * Update user info display
  * @param {Object} userInfo - User info object
  */
@@ -387,6 +376,128 @@ export function hideTaskDetails() {
     const container = getElement('taskDetailsContainer');
     if (container) {
         removeClass(container, 'active');
+    }
+}
+
+/**
+ * Render calendar tasks list with checkboxes
+ * @param {Array} completedTasks - Completed tasks
+ * @param {Array} uncompletedTasks - Uncompleted tasks
+ * @param {Function} onToggle - Toggle handler
+ * @param {Object} pendingUpdates - Map of pending update task IDs
+ */
+export function renderCalendarTasks(completedTasks, uncompletedTasks, onToggle, pendingUpdates = new Map()) {
+    const container = getElement('calendarTasksContainer');
+    const listEl = getElement('calendarTaskList');
+    const loadingEl = getElement('calendarTasksLoading');
+
+    if (!container || !listEl) return;
+
+    const allTasks = [
+        ...completedTasks.map(t => ({ ...t, isCompleted: true })),
+        ...uncompletedTasks.map(t => ({ ...t, isCompleted: false }))
+    ];
+
+    if (allTasks.length === 0) {
+        listEl.innerHTML = '<li class="no-tasks-message">No calendar tasks found. Add events to your calendar to track them here.</li>';
+        return;
+    }
+
+    listEl.innerHTML = allTasks.map(task => createCalendarTaskItem(task, onToggle, pendingUpdates)).join('');
+}
+
+/**
+ * Create calendar task item HTML
+ * @param {Object} task - Task object with isCompleted flag
+ * @param {Function} onToggle - Toggle handler
+ * @param {Object} pendingUpdates - Map of pending update task IDs
+ * @returns {string} HTML string
+ */
+function createCalendarTaskItem(task, onToggle, pendingUpdates) {
+    const taskId = task.eventId || task.id;
+    const isPending = pendingUpdates.has(taskId);
+    const completedClass = task.isCompleted ? 'completed' : '';
+    const loadingClass = isPending ? 'loading' : '';
+
+    const taskDate = task.completed_date || task.due;
+    const formattedDate = taskDate ? formatDateTime(taskDate) : 'No date';
+
+    let taskLink = '#';
+    if (task.htmlLink) {
+        taskLink = task.htmlLink;
+    } else if (task.calendarId && task.eventId) {
+        taskLink = `https://calendar.google.com/calendar/u/0/r/eventedit/${task.eventId}`;
+    }
+
+    return `
+        <li class="calendar-task-item ${completedClass} ${loadingClass}" data-task-id="${taskId}">
+            <input 
+                type="checkbox" 
+                class="calendar-task-checkbox" 
+                ${task.isCompleted ? 'checked' : ''}
+                ${isPending ? 'disabled' : ''}
+                data-task-id="${taskId}"
+                data-is-completed="${task.isCompleted}"
+            >
+            <div class="calendar-task-content">
+                <div class="calendar-task-title">${escapeHtml(task.title)}</div>
+                <div class="calendar-task-meta">
+                    <span class="calendar-task-date">📅 ${formattedDate}</span>
+                    <span class="calendar-task-list-name">📁 ${escapeHtml(task.list)}</span>
+                    <span class="calendar-task-color-indicator" style="background-color: ${task.color || '#546e7a'}"></span>
+                </div>
+                ${isPending ? '<div class="calendar-task-error">Updating...</div>' : ''}
+            </div>
+            <div class="calendar-task-actions">
+                <a href="${taskLink}" target="_blank" class="calendar-task-link" title="Open in Calendar">
+                    🔗
+                </a>
+            </div>
+        </li>
+    `;
+}
+
+/**
+ * Update task checkbox state
+ * @param {string} taskId - Task ID
+ * @param {boolean} isCompleted - New completion status
+ */
+export function updateTaskCheckbox(taskId, isCompleted) {
+    const checkbox = document.querySelector(`.calendar-task-checkbox[data-task-id="${taskId}"]`);
+    if (checkbox) {
+        checkbox.checked = isCompleted;
+        const taskItem = checkbox.closest('.calendar-task-item');
+        if (taskItem) {
+            toggleClass(taskItem, 'completed', isCompleted);
+        }
+    }
+}
+
+/**
+ * Set task item loading state
+ * @param {string} taskId - Task ID
+ * @param {boolean} isLoading - Loading state
+ */
+export function setTaskLoading(taskId, isLoading) {
+    const taskItem = document.querySelector(`.calendar-task-item[data-task-id="${taskId}"]`);
+    if (taskItem) {
+        toggleClass(taskItem, 'loading', isLoading);
+    }
+}
+
+/**
+ * Show task error message
+ * @param {string} taskId - Task ID
+ * @param {string} message - Error message
+ */
+export function showTaskError(taskId, message) {
+    const taskItem = document.querySelector(`.calendar-task-item[data-task-id="${taskId}"]`);
+    if (taskItem) {
+        addClass(taskItem, 'error');
+        const errorEl = taskItem.querySelector('.calendar-task-error');
+        if (errorEl) {
+            errorEl.textContent = message;
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import { tasksApi } from './api/tasksApi.js';
 import { calendarApi } from './api/calendarApi.js';
 import { taskProcessor } from './services/taskProcessor.js';
 import { filterService } from './services/filterService.js';
+import { taskToggleService } from './services/taskToggleService.js';
 import { stateManager } from './ui/stateManager.js';
 import { chartManager } from './ui/chartManager.js';
 import {
@@ -19,7 +20,6 @@ import {
     hideDashboard,
     showAuthSuccess,
     hideAuthSuccess,
-    showFileInput,
     updateUserInfo,
     populateSelect,
     updateSummaryStats,
@@ -27,7 +27,9 @@ import {
     hideTaskDetails,
     updateActivePreset,
     addEventListener,
-    getElement
+    getElement,
+    renderCalendarTasks,
+    updateTaskCheckbox
 } from './ui/domUtils.js';
 
 class TaskApp {
@@ -50,9 +52,6 @@ class TaskApp {
      * Set up event listeners
      */
     _setupEventListeners() {
-        // File input
-        addEventListener('fileInput', 'change', (e) => this._handleFileSelect(e));
-
         // Single date picker
         addEventListener('singleDate', 'change', () => this._handleSingleDateChange());
 
@@ -75,6 +74,12 @@ class TaskApp {
 
         // Close task details
         addEventListener('closeTaskDetails', 'click', () => hideTaskDetails());
+
+        // Calendar tasks checkbox toggle
+        const calendarTaskList = getElement('calendarTaskList');
+        if (calendarTaskList) {
+            calendarTaskList.addEventListener('change', (e) => this._handleTaskToggle(e));
+        }
     }
 
     /**
@@ -155,53 +160,6 @@ class TaskApp {
 
         } catch (error) {
             showError('Failed to load tasks: ' + error.message);
-            hideLoading();
-        }
-    }
-
-    /**
-     * Handle file upload
-     * @param {Event} e - File input change event
-     */
-    _handleFileSelect(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const data = JSON.parse(event.target.result);
-                this._processFileData(data);
-            } catch (error) {
-                showError('Invalid JSON file');
-            }
-        };
-        reader.readAsText(file);
-    }
-
-    /**
-     * Process uploaded file data
-     * @param {Object} data - Parsed JSON data
-     */
-    _processFileData(data) {
-        showLoading();
-
-        try {
-            const mergedData = taskProcessor.mergeTasks(data, null);
-            const dateRange = taskProcessor.calculateDateRange(mergedData.completed);
-
-            stateManager.setTaskData(mergedData);
-            stateManager.setDateRange(dateRange.min, dateRange.max);
-            stateManager.resetFilters();
-
-            this._populateSelectors();
-            this._updateCharts();
-
-            hideLoading();
-            showDashboard();
-
-        } catch (error) {
-            showError('Error processing file: ' + error.message);
             hideLoading();
         }
     }
@@ -408,6 +366,147 @@ class TaskApp {
             listName
         );
         chartManager.renderTaskCompletionRateChart(rateData.labels, rateData.completed, rateData.uncompleted);
+
+        // Render calendar tasks view (with filters applied)
+        const filteredCompleted = filterService.filterTasks(state.completedTasks, {
+            startDate,
+            endDate,
+            listName,
+            taskName
+        });
+
+        const filteredUncompleted = filterService.filterTasks(state.uncompletedTasks, {
+            startDate,
+            endDate,
+            listName,
+            taskName
+        });
+
+        renderCalendarTasks(
+            filteredCompleted,
+            filteredUncompleted,
+            (task, newStatus) => this._handleTaskUpdate(task, newStatus),
+            taskToggleService.pendingUpdates
+        );
+    }
+
+    /**
+     * Handle task toggle from calendar tasks view
+     * @param {Event} e - Change event
+     */
+    _handleTaskToggle(e) {
+        const checkbox = e.target;
+        if (!checkbox.classList.contains('calendar-task-checkbox')) return;
+
+        const taskId = checkbox.dataset.taskId;
+        const isCurrentlyCompleted = checkbox.dataset.isCompleted === 'true';
+
+        const task = this._findTaskById(taskId);
+        if (!task) {
+            showError('Task not found');
+            checkbox.checked = !checkbox.checked;
+            return;
+        }
+
+        this._toggleTask(task, isCurrentlyCompleted, checkbox);
+    }
+
+    /**
+     * Find task by ID from current state
+     * @param {string} taskId - Task/event ID
+     * @returns {Object|null} Task object or null
+     */
+    _findTaskById(taskId) {
+        const state = stateManager.getFullState();
+        return state.completedTasks.find(t => (t.eventId || t.id) === taskId) ||
+               state.uncompletedTasks.find(t => (t.eventId || t.id) === taskId) ||
+               null;
+    }
+
+    /**
+     * Toggle task completion status
+     * @param {Object} task - Task object
+     * @param {boolean} isCurrentlyCompleted - Current status
+     * @param {HTMLElement} checkbox - Checkbox element
+     */
+    async _toggleTask(task, isCurrentlyCompleted, checkbox) {
+        const accessToken = stateManager.getAccessToken();
+        if (!accessToken) {
+            showError('Not authenticated. Please sign in again.');
+            checkbox.checked = !checkbox.checked;
+            return;
+        }
+
+        try {
+            const result = await taskToggleService.toggleWithOptimisticUpdate(
+                task,
+                isCurrentlyCompleted,
+                (t, newStatus) => this._onOptimisticUpdate(t, newStatus),
+                (t, oldStatus) => this._onRollback(t, oldStatus),
+                accessToken
+            );
+
+            if (result.success) {
+                await this._refreshTasks();
+            } else {
+                showError('Failed to update task: ' + (result.error || 'Unknown error'));
+                checkbox.checked = !checkbox.checked;
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+            checkbox.checked = !checkbox.checked;
+        }
+    }
+
+    /**
+     * Handle optimistic UI update
+     * @param {Object} task - Task object
+     * @param {boolean} newStatus - New completion status
+     */
+    _onOptimisticUpdate(task, newStatus) {
+        updateTaskCheckbox(task.eventId || task.id, newStatus);
+    }
+
+    /**
+     * Handle rollback on error
+     * @param {Object} task - Task object
+     * @param {boolean} oldStatus - Previous completion status
+     */
+    _onRollback(task, oldStatus) {
+        updateTaskCheckbox(task.eventId || task.id, oldStatus);
+    }
+
+    /**
+     * Refresh tasks after toggle
+     */
+    async _refreshTasks() {
+        const token = stateManager.getAccessToken();
+        if (!token) return;
+
+        try {
+            const calendarEvents = await calendarApi.fetchAllEvents(token);
+            const calendarTasks = calendarApi.processEvents(calendarEvents);
+            const tasksData = await tasksApi.fetchAllTasks(token);
+            const mergedData = taskProcessor.mergeTasks(tasksData, calendarTasks);
+
+            stateManager.setTaskData({
+                ...mergedData,
+                calendars: calendarEvents.map(e => e.calendarName).filter((v, i, a) => a.indexOf(v) === i)
+            });
+
+            this._updateCharts();
+        } catch (error) {
+            console.error('Failed to refresh tasks:', error);
+        }
+    }
+
+    /**
+     * Handle task update (placeholder for future use)
+     * @param {Object} task - Task object
+     * @param {boolean} newStatus - New completion status
+     */
+    _handleTaskUpdate(task, newStatus) {
+        // Placeholder for future task update logic
     }
 }
 

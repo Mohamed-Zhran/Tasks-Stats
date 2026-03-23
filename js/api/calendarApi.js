@@ -102,6 +102,7 @@ class CalendarAPI {
         const completed = [];
         const uncompleted = [];
 
+        const STORAGE_PREFIX = 'task_original_color_';
 
         for (const event of events) {
             const title = event.summary;
@@ -130,6 +131,10 @@ class CalendarAPI {
 
             const datePart = taskDate.split('T')[0];
 
+            // For uncompleted tasks, their current color is their original color
+            // For completed tasks, we'll check localStorage below
+            let originalColorId = colorId;
+
             const taskData = {
                 title: title,
                 id: event.id,
@@ -141,10 +146,20 @@ class CalendarAPI {
                 htmlLink: event.htmlLink,
                 completed_date: eventDate,
                 completion_date: datePart,
-                source: 'calendar'
+                source: 'calendar',
+                originalColorId: originalColorId
             };
 
             if (colorId === CALENDAR_COLORS.SAGE) {
+                // For completed tasks, check localStorage for the original color before completion
+                try {
+                    const storedColor = localStorage.getItem(STORAGE_PREFIX + event.id);
+                    if (storedColor) {
+                        taskData.originalColorId = storedColor;
+                    }
+                } catch (e) {
+                    // Ignore localStorage errors
+                }
                 completed.push(taskData);
             } else {
                 taskData.status = config.taskStatus.needsAction;
@@ -157,17 +172,52 @@ class CalendarAPI {
     }
 
     /**
+     * Update event color (for marking tasks as completed/uncompleted)
+     * @param {string} calendarId - Calendar ID
+     * @param {string} eventId - Event ID
+     * @param {string} colorId - New color ID
+     * @param {string} accessToken - Google OAuth2 access token
+     * @returns {Promise<Object>} Updated event
+     */
+    async updateEventColor(calendarId, eventId, colorId, accessToken) {
+        try {
+            const url = `${config.api.calendarBase}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`;
+            
+            const response = await this._makeRequest(
+                url,
+                accessToken,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        colorId: colorId
+                    })
+                }
+            );
+
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    /**
      * Make authenticated API request with retry logic
      * @param {string} url - API endpoint URL
      * @param {string} accessToken - Google OAuth2 access token
+     * @param {Object} options - Fetch options
      * @returns {Promise<Object>} API response
      * @private
      */
-    async _makeRequest(url, accessToken) {
+    async _makeRequest(url, accessToken, options = {}) {
         return retry(
             async () => {
                 const response = await fetch(url, {
+                    ...options,
                     headers: {
+                        ...options.headers,
                         'Authorization': `Bearer ${accessToken}`
                     }
                 });

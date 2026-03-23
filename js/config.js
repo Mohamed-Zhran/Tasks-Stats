@@ -9,7 +9,7 @@ export const config = {
     },
 
     oauth: {
-        scope: 'openid email profile https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/calendar.readonly',
+        scope: 'openid email profile https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/calendar',
         state: 'tasks_app'
     },
 

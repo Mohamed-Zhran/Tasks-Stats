@@ -44,14 +44,8 @@
                 Sign in with Google
             </button>
 
-            <div class="auth-divider">or</div>
-
-            <input type="file" id="fileInput" accept=".json">
-            <label for="fileInput" class="file-input-label">
-                📁 Load Tasks.json File
-            </label>
             <p style="margin-top: 15px; color: #666;">
-                Sign in with Google to sync your tasks automatically, or upload your Tasks.json file manually.
+                Sign in with Google to sync your tasks and calendar automatically.
             </p>
         </div>
 
@@ -73,13 +67,6 @@
                 </svg>
                 Refresh Tasks
             </button>
-        </div>
-
-        <!-- File Input Container (shown when no auth) -->
-        <div class="file-input-container hidden" id="fileInputContainer">
-            <p style="margin-top: 15px; color: #666;">
-                Please select your Tasks.json file to view task completion statistics.
-            </p>
         </div>
 
         <!-- Dashboard -->
@@ -152,6 +139,18 @@
                     <div class="stat-value" id="bestDayCount">0</div>
                     <div class="stat-label">Tasks on Best Day</div>
                 </div>
+            </div>
+
+            <!-- Calendar Tasks View -->
+            <div class="calendar-tasks-container" id="calendarTasksContainer">
+                <div class="calendar-tasks-header">
+                    <h3>📅 Calendar Tasks</h3>
+                    <span class="calendar-tasks-hint">Check to mark as completed (Sage), uncheck for uncompleted</span>
+                </div>
+                <div class="calendar-tasks-loading" id="calendarTasksLoading" style="display: none;">
+                    ⏳ Loading tasks...
+                </div>
+                <ul class="calendar-task-list" id="calendarTaskList"></ul>
             </div>
 
             <!-- Main Chart -->
